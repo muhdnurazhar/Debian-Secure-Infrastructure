@@ -19,10 +19,9 @@ This project simulates a real-world enterprise Linux-based (Debian 13) which foc
 
  This topology outlines resilent and enterprise production multi-site using 3 multiple sites
  ### Headquarters: ** Act as the main corporate network hosting core identity services and internal user endpoint using Active Directory concepts. 
- 1. Network and IP Management
- 2. firewall?
- 3. Central User Login
- 4. File Sharing
+ 1. Integrating DHCP with DDNS to ensure network names update automatically.
+ 2. Deployed an OpenLDAP server to manage all credentials end-client
+ 3. Use a Samba file server to securely share data with separating internal data folder and only public-view folder.  
 
  ### Server Farm/ DMZ
  1. Smart Web Traffic to secure the network from redirecting all the way to the backend server
