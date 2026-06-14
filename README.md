@@ -48,17 +48,22 @@ Simulates the public internet environment to connect all corporate sites togethe
 * **Chaining:** Confirms that Objective 1 is met by validating active OSPF routing, GRE over IPsec VPN tunnel stability, and active DHCP-DDNS updates.
 * **Verification & Expected Logs:**
 
-```bash
 # Check OSPF neighbor status and routing table on HQ-EDGE
+```bash
 ip route show protocol ospf
 sudo vtysh -c "show ip ospf neighbor"
+```
 
 # Verify GRE over IPsec VPN tunnel interface state
+```bash
 ip link show tun1
 sudo strongswan status
+```
 
 # Verifying isc-dhcp-server and ddns
+``` bash
 journalctl -u isc-dhcp-server -u namned --no-pager -n 20
+```
 
 # Test dynamic DNS resolution on CLIENT after DHCP lease binding
 nslookup client.wsmb2026.my 192.168.10.10
