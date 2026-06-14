@@ -102,12 +102,12 @@ Name:   CLIENT.wsmb2026.my
 Address: 192.168.10.158
 ```
 
-Verification 2: Centralized Identity & Trusted Data Governance
+### Verification 2: Centralized Identity & Trusted Data Governance
 What & Why: Verifying that network endpoints securely authorize domain users via a central directory and enforce safe, role-based file and email communications.
 
 Chaining: Confirms that Objective 2 is met by validating client-side PAM OpenLDAP login bounds, conditional Samba share restrictions, and TLS-hardened corporate messaging.
 
-*Query LDAP Validation*
+### *Query LDAP Validation* ###
 ```bash
 root@CLIENT:~# ldapsearch -x -H ldap://192.168.10.10 -b "cn=users,ou=groups,dc=wsmb2026,dc=my"
 # extended LDIF
@@ -135,15 +135,14 @@ result: 0 Success
 # numEntries: 
 ```
 
-### Query 
-*Test remote SSH authorization using an LDAP directory user from CLIENT*
+### *Test remote SSH authorization using an LDAP directory user from CLIENT* ###
 ```bash
 root@CLIENT:~# ssh krishnan@client.wsmb2026.my id
 krishnan@client.wsmb2026.my's password:
 uid=10002(krishnan) gid=10000(groups) groups=10000(groups)
 ```
 
-*Test corporate data governance boundaries on Samba data shares*
+### *Test corporate data governance boundaries on Samba data shares* ###
 ```bash
 root@CLIENT:~# smbclient //192.168.10.10/internal -U smbuser%Skills39
 Try "help" to get a list of possible commands.
@@ -156,7 +155,7 @@ smb: \> ls
                 19353424 blocks of size 1024. 16989856 blocks available
 ```
 
-*Verify secure, encrypted SMTPS/IMAPS communication with Mail Server using custom CA*
+### *Verify secure, encrypted SMTPS/IMAPS communication with Mail Server using custom CA* ###
 ```bash
 root@CLIENT:~# openssl s_client -connect mail.itnsa.my:465 -brief
 Connecting to 192.168.20.11
