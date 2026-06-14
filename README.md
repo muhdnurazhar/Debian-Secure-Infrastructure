@@ -48,7 +48,7 @@ Simulates the public internet environment to connect all corporate sites togethe
 * **Chaining:** Confirms that Objective 1 is met by validating active OSPF routing, GRE over IPsec VPN tunnel stability, and active DHCP-DDNS updates.
 * **Verification & Expected Logs:**
 
-* **Check OSPF neighbor status and routing table on HQ-EDGE**
+*Check OSPF neighbor status and routing table on HQ-EDGE*
 ```bash
 ip route show protocol ospf
 sudo vtysh -c "show ip ospf neighbor"
