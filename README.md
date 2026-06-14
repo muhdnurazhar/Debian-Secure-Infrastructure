@@ -3,37 +3,41 @@
 ## Introduction & Project Overview
 > This project simulates a real-world enterprise Linux-based (Debian 13) which focusses on security, centralization, load-balancing which is merge scenario where to geographically separated for coporate domains: (Headquarters) wsmb2026.my, (Server Farm) itnsa.my to establish reliable communication channels.
 
-## Project Objective
+## Project Objectives
 
-> To architect and deploy a production-ready, multi-site enterprise infrastructure that securely integrates two distinct corporate domains using simulated internet using Public ISP. 
+To architect and validate a production enterprise network connectivity, multi site Linux enterprise environment across the `wsmb2026.my` and `itnsa.my` domains by achieving the following milestones:
 
-1. Utilizing critical thinking to solve core infrastructure challenges.
+1. **Secure Network Infrastructure & Core Addressing Automation**
+   To establish a secure, routed network backbone using dynamic routing (OSPF), encrypted site-to-site communication (GRE over IPsec VPN), perimetric firewalls (NFTables), and automated client addressing with real-time record updates (DHCP with Dynamic DNS).
 
-2. Enforcing a Zero-Trust security perimeter.
+2. **Centralized Identity Access Control & Trusted Data Governance**
+   To deploy a unified user directory (OpenLDAP) and a custom Certificate Authority (CA) to enforce role-based network file sharing (Samba) and secure transport-layer corporate messaging (SMTPS/IMAPS Email) across the enterprise perimeters.
 
-3. Mitigating single points of failure which have redundacy for multiple services also achieve rapid scaling for enterprises.
+3. **High-Availability Application Delivery & Infrastructure as Code (IaC)**
+   To engineer a resilient server environment utilizing reverse proxy load-balancing with TLS termination (HAProxy), automated multi-node web provisioning (Apache), fault-tolerant primary/secondary zone replication (BIND9 DNS Master-Slave), and zero-touch deployment pipelines (Ansible Automation).
 
 ## Technical Architecture & Implementation
 
-<img width="921" height="799" alt="Screenshot 2026-06-13 124132" src="https://github.com/user-attachments/assets/db8c91d8-e542-414d-bea7-10870ab21cec" />
+<img width="921" height="799" alt="Simulated Infrastructure Topology" src="https://github.com/user-attachments/assets/db8c91d8-e542-414d-bea7-10870ab21cec" />
 
- This topology outlines resilent and enterprise production multi-site using 3 multiple sites
- ### Headquarters
- > Act as the main corporate network hosting core identity services and internal user endpoint using Active Directory concepts. 
- 1. Integrating DHCP with DDNS to ensure network names update automatically.
- 2. Deployed an OpenLDAP server to manage all credentials end-client
- 3. Use a Samba file server to securely share data with separating internal data folder and only public-view folder.  
+This multi-site network uses Debian 13 to run a resilient enterprise production infrastructure. All services are integrated together to handle security, automation, and high availability.
 
- ### Server Farm/ DMZ
- > This segment will act as an backend services to simulate traffic network internal and external access.
- 1. HaProxy to secure the network from redirecting all the way to the backend server
- 2. DNS servers that automatically sync with primary and secondary DNS to mitigate any outage happen
- 3. Setup and securing enterprise email using postfix dovecot package using SSL/TLS form digital certificates
- 4. Ansible was used automated code to setup and configure servers instantly while also reduced human errors.
+### 1. Headquarters Perimeter (`wsmb2026.my`)
+Focuses on internal LAN operations, user identity management, and secure data storage:
+* **ISC-DHCP & BIND9 (DDNS):** Automatically allocates client IPs and updates DNS records instantly.
+* **OpenLDAP:** Acts as the single central server to manage and authenticate all user logins.
+* **Samba File Server:** Secures corporate data by separating public read-only folders from private internal data.
 
- ### Public ISP Transit
- > Act as untrusted public internet connecting all corporate sites 
- 1. All the edge routers were using OSPF routing protocol only for public subnets to route public traffic across the network.
- 2. Implementing GRE over IPsec both edge routers using certifcate-based and placed on trusted root certicate authorities on each servers.
- 3. Also block all untrusted incoming internet traffic by default and only explicitly allowed internal traffic 
+### 2. Server Farm & DMZ Zone (`itnsa.my`)
+Hosts core business applications and handles internal and external traffic demands:
+* **HAProxy reverse proxy:** Enforces HTTP-to-HTTPS redirect and load-balances web traffic using Round-Robin.
+* **Apache Web & BIND9 Cluster:** Runs active web endpoints backed by a Master-Slave DNS zone replication to prevent failure.
+* **Postfix & Dovecot Email:** Provides secure corporate messaging using SSL/TLS certificates and LDAP integration.
+* **Ansible Automation:** Uses automated playbooks for zero-touch configuration to set up secondary servers instantly.
+
+### 3. Public ISP Transit Backbone (`internet.com`)
+Simulates the public internet environment to connect all corporate sites together securely:
+* **FRRouting (OSPF):** Runs dynamic routing across edge boundaries strictly for public subnets.
+* **GRE over IPsec VPN:** Builds secure, encrypted site-to-site tunnels authenticated by a custom Certificate Authority (CA).
+* **NFTables Firewall:** Blocks untrusted incoming public traffic by default while allowing internal hosts to use PAT.
 
