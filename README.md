@@ -54,13 +54,13 @@ ip route show protocol ospf
 sudo vtysh -c "show ip ospf neighbor"
 ```
 
-# Verify GRE over IPsec VPN tunnel interface state
+*Verify GRE over IPsec VPN tunnel interface state*
 ```bash
 ip link show tun1
 sudo strongswan status
 ```
 
-# Verifying isc-dhcp-server and ddns
+*Verifying isc-dhcp-server and ddns*
 ``` bash
 journalctl -u isc-dhcp-server -u namned --no-pager -n 20
 ```
@@ -68,19 +68,23 @@ journalctl -u isc-dhcp-server -u namned --no-pager -n 20
 # Test dynamic DNS resolution on CLIENT after DHCP lease binding
 nslookup client.wsmb2026.my 192.168.10.10
 
-```text
-# OSPF Routing Verification:
+*OSPF Routing Verification:*
+```bash
 root@HQ-EDGE:~# sudo vtysh -c "show ip ospf neighbor"
 
 Neighbor ID     Pri State           Up Time         Dead Time Address         Interface                   
 210.187.97.126    1 Full/DR         1h19m48s          31.717s 103.17.78.6     ens37:103.17.78.1       
+```
 
-# GRE Tunnel Verification
+*GRE Tunnel Verification*
+```bash
 root@HQ-EDGE:~# ip link show tun1
 7: tun1@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1476 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
     link/gre 103.17.78.1 peer 203.80.16.1
+```
 
-# Swanctl Security Associations (SA) Output:
+*Swanctl Security Associations (SA) Output:*
+```bash
 root@HQ-EDGE:~# swanctl -l
 conn: #1, ESTABLISHED, IKEv2, d29b8df9e76c2de9_i* b34e1173cf5c6461_r
   local  'C=MY, CN=HQ-EDGE.wsmb2026.my' @ 103.17.78.1[4500]
@@ -93,37 +97,35 @@ conn: #1, ESTABLISHED, IKEv2, d29b8df9e76c2de9_i* b34e1173cf5c6461_r
     out cd9240a8,  69764 bytes,  1041 packets,    22s ago
     local  192.168.10.0/24 192.168.200.1/32
     remote 192.168.20.0/24 192.168.200.2/32
+```
 
-# DHCP-DDNS Handshake Log:
+*DHCP-DDNS Handshake Log:*
+```bash
 Jun 14 21:46:45 HQ-EDGE dhcpd[1675]: DHCPDISCOVER from 00:0c:29:bd:f8:8e via ens33
 Jun 14 21:46:46 HQ-EDGE dhcpd[1675]: DHCPOFFER on 192.168.10.158 to 00:0c:29:bd:f8:8e (CLIENT) via ens33
 Jun 14 21:46:46 HQ-EDGE dhcpd[1675]: DHCPREQUEST for 192.168.10.158 (192.168.10.254) from 00:0c:29:bd:f8:8e (CLIENT) via ens33
 Jun 14 21:46:46 HQ-EDGE dhcpd[1675]: DHCPACK on 192.168.10.158 to 00:0c:29:bd:f8:8e (CLIENT) via ens33
 Jun 14 21:46:46 HQ-EDGE dhcpd[1675]: Added new forward map from CLIENT.wsmb2026.my to 192.168.10.158
 Jun 14 21:46:46 HQ-EDGE dhcpd[1675]: Added reverse map from 158.10.168.192.in-addr.arpa. to CLIENT.wsmb2026.my
+```
 
-# Validation of DDNS on Client:
+*Validation of DDNS on Client:*
+```bash
 root@CLIENT:~# nslookup client.wsmb2026.my
 Server:         192.168.10.10
 Address:        192.168.10.10#53
 
 Name:   CLIENT.wsmb2026.my
 Address: 192.168.10.158
+```
 
 Verification 2: Centralized Identity & Trusted Data Governance
 What & Why: Verifying that network endpoints securely authorize domain users via a central directory and enforce safe, role-based file and email communications.
 
 Chaining: Confirms that Objective 2 is met by validating client-side PAM OpenLDAP login bounds, conditional Samba share restrictions, and TLS-hardened corporate messaging.
-```
 
-### Verification 2: Centralized Identity & Trusted Data Governance
-* **What & Why:** Verifying that network endpoints securely authorize domain users via a central directory and enforce safe, role-based file and email communications.
-* **Chaining:** Confirms that Objective 2 is met by validating client-side PAM OpenLDAP login bounds, conditional Samba share restrictions, and TLS-hardened corporate messaging.
-* **Verification & Expected Logs:**
-
-```
-### Query LDAP Validation
-```text
+*Query LDAP Validation*
+```bash
 root@CLIENT:~# ldapsearch -x -H ldap://192.168.10.10 -b "cn=users,ou=groups,dc=wsmb2026,dc=my"
 # extended LDIF
 #
@@ -151,15 +153,15 @@ result: 0 Success
 ```
 
 ### Query 
-# Test remote SSH authorization using an LDAP directory user from CLIENT
-```text
+*Test remote SSH authorization using an LDAP directory user from CLIENT*
+```bash
 root@CLIENT:~# ssh krishnan@client.wsmb2026.my id
 krishnan@client.wsmb2026.my's password:
 uid=10002(krishnan) gid=10000(groups) groups=10000(groups)
 ```
 
-# Test corporate data governance boundaries on Samba data shares
-```text
+*Test corporate data governance boundaries on Samba data shares*
+```bash
 root@CLIENT:~# smbclient //192.168.10.10/internal -U smbuser%Skills39
 Try "help" to get a list of possible commands.
 smb: \> mkdir testing from client
@@ -171,8 +173,8 @@ smb: \> ls
                 19353424 blocks of size 1024. 16989856 blocks available
 ```
 
-# Verify secure, encrypted SMTPS/IMAPS communication with Mail Server using custom CA
-```text
+*Verify secure, encrypted SMTPS/IMAPS communication with Mail Server using custom CA*
+```bash
 root@CLIENT:~# openssl s_client -connect mail.itnsa.my:465 -brief
 Connecting to 192.168.20.11
 CONNECTION ESTABLISHED
