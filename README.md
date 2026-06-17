@@ -102,6 +102,91 @@ Name:   CLIENT.wsmb2026.my
 Address: 192.168.10.158
 ```
 
+#### *Nftables script on edge router* ####
+
+> DC-EDGE
+```bash
+# DC-EDGE nftables
+nft add table nat
+nft flush table nat
+
+#nat chain
+nft add chain ip nat 'prerouting { type nat hook prerouting priority -100; policy accept; }'
+nft add chain ip nat 'postrouting { type nat hook postrouting priority 100; policy accept; }'
+
+#nat rules
+nft add 'rule ip nat postrouting ip saddr 192.168.20.0/24 ip daddr 192.168.10.0/24 counter accept comment "disable nat on vpn"'
+nft add 'rule ip nat postrouting oifname ens37 counter masquerade comment "enable pat connections"'
+nft add 'rule ip nat prerouting iif ens37 udp dport 53 dnat to 192.168.20.12 comment "enable dns forwarding"'
+nft add 'rule ip nat prerouting iif ens37 tcp dport 25 dnat to 192.168.20.11 comment "enable smtp forwarding"'
+```
+
+
+> HQ-EDGE
+```bash
+#HQ-EDGE nftables
+nft add table nat
+nft add table filter 
+
+nft flush table nat 
+nft flush table filter
+
+#nat chain
+nft add chain ip nat 'prerouting { type nat hook prerouting priority -100; policy accept; }'
+nft add chain ip nat 'postrouting { type nat hook postrouting priority 100; policy accept; }'
+
+#filter chain
+nft add chain ip filter 'input { type filter hook input priority 0; policy drop; }'
+nft add chain ip filter 'output { type filter hook output priority 0; policy accept; }'
+nft add chain ip filter 'forward { type filter hook forward priority 0; policy drop; }'
+
+#nat rules
+nft add 'rule ip nat postrouting ip daddr 192.168.20.0/24 counter accept comment "disable nat on vpn"'
+nft add 'rule ip nat postrouting oifname ens37 counter masquerade comment "enable pat connections"'
+
+#filter rules
+nft  add 'rule ip filter input ct state related,established counter accept comment "enable ct state rules"'
+nft  add 'rule ip filter output ct state related,established counter accept comment "enable ct state rules"'
+nft  add 'rule ip filter forward ct state related,established counter accept comment "enable ct state rules"' 
+
+nft  add 'rule ip filter input ip protocol icmp counter accept comment "enable icmp rules"'
+nft  add 'rule ip filter forward ip protocol icmp counter accept comment "enable icmp rules"'
+
+nft  add 'rule ip filter input ip protocol ospf counter accept comment "enable ospf rules"'
+nft  add 'rule ip filter forward ip protocol ospf counter accept comment "enable ospf rules"'
+
+nft  add 'rule ip filter input ip protocol gre counter accept comment "enable gre rules"'
+nft  add 'rule ip filter forward ip protocol gre counter accept comment "enable gre rules"'
+
+nft  add 'rule ip filter input ip protocol esp counter accept comment "enable esp rules"'
+nft  add 'rule ip filter forward ip protocol esp counter accept comment "enable esp rules"'
+
+nft add 'rule ip filter input tcp dport 389 counter accept comment "enable ldap port"'
+nft add 'rule ip filter forward tcp dport 389 counter accept comment "enable ldap port"'
+
+nft add 'rule ip filter input tcp dport 22 counter accept comment "enable scp port"'
+nft add 'rule ip filter forward tcp dport 22 counter accept comment "enable scp port"'
+
+nft add 'rule ip filter input udp dport 53 counter accept comment "enable scp port"'
+nft add 'rule ip filter forward udp dport 53 counter accept comment "enable scp port"'
+
+nft add 'rule ip filter input tcp dport { 500, 4500 } counter accept comment "open vpn port connections" '
+nft add 'rule ip filter forward tcp dport { 500, 4500 } counter accept comment "open vpn port connections" '
+
+nft add 'rule ip filter input ip saddr 192.168.10.0/24 counter accept comment "explicitly allowed internals"'
+nft add 'rule ip filter forward ip saddr 192.168.10.0/24 counter accept comment "explicitly allowed internals"'
+```
+
+### *Open router and execute script each* ###
+> HQ-EDGE
+```bash
+root@HQ-EDGE:~# ./fw.sh 
+```
+> DC-EDGE
+```bash
+root@DC-EDGE:~# ./fw.sh 
+```
+
 ### Verification 2: Centralized Identity & Trusted Data Governance
 What & Why: Verifying that network endpoints securely authorize domain users via a central directory and enforce safe, role-based file and email communications.
 
@@ -233,4 +318,11 @@ PLAY RECAP *********************************************************************
 DC-SRV3                    : ok=10   changed=5    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
+## Conclusion & Key Accomplishments
+This project successfully creates a reliable Linux network setup that combines strong security with non-stop system uptime. Through this project, I achieved these core technical milestones:
+
+* **Automated Server Setup:** Used Ansible to configure multiple servers instantly. This removes the need for manual setup and completely avoids human mistakes.
+* **Network Defense & Encryption:** Protected the network using custom firewalls (NFTables) and set up highly secure, encrypted VPN tunnels (GRE over IPsec) between different offices.
+* **Backup & High Availability:** Kept services running smoothly without down-time by using a traffic loader (HAProxy) and automatic DNS backup replication (BIND9 Master-Slave).
+* **Central User & File Control:** Maintained a secure and organized workplace by using a central login system (OpenLDAP) and setting up strict file-sharing permissions (Samba) for different user groups.
 
