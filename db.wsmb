@@ -1,0 +1,15 @@
+$TTL 2d    
+$ORIGIN wsmb2026.my. 
+@         IN      SOA   INTSRV.wsmb2026.my. hostmaster.wsmb2026.my. (
+                                2003080800 ; serial number
+                                12h        ; refresh
+                                15m        ; update retry
+                                4d         ; expiry
+                                2h         ; minimum
+                                )
+@               IN      NS      INTSRV.wsmb2026.my.
+@               IN      A       192.168.10.10
+INTSRV          IN      A       192.168.10.10
+HQ-EDGE         IN      A       192.168.10.254
+ldap            IN      CNAME   INTSRV
+_ldap._tcp.wsmb2026.my.  IN   SRV  10 50 389 INTSRV.wsmb2026.my
