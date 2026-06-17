@@ -1,0 +1,11 @@
+$TTL 1D
+@        IN        SOA  INTSRV.wsmb2026.my. root.wsmb2026.my. (
+                        2007091701 ; serial
+                        30800      ; refresh
+                        7200       ; retry
+                        604800     ; expire
+                        300 )      ; minimum
+@       IN      NS      INTSRV.wsmb2026.my.
+@       IN      PTR     INTSRV.wsmb2026.my.
+10      IN      PTR     INTSRV.wsmb2026.my.
+254     IN      PTR     HQ-EDGE.wsmb2026.my.
